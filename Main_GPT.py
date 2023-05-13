@@ -1,4 +1,5 @@
 import threading
+import random
 from pathlib import Path
 from pygame import mixer, image
 from classes import *
@@ -35,7 +36,12 @@ class FlappyBirdGame:
             self.cur_path + '/assets/sprites/down.png')
         ##################################################
         self.frames_per_step = 10
-        self.run()
+        self.env_setup = False
+        self.rendering_thread = threading.Thread(target=self.run)
+        self.rendering_thread.start()
+        while not self.env_setup:
+            w = 1
+        # self.run()
 
     def run(self):
         glutInit()
@@ -49,6 +55,7 @@ class FlappyBirdGame:
         glutKeyboardFunc(self.keyboard)
         glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF)
         self.init()
+        self.env_setup = True
         self.frames(1000)
         glutMainLoop()
 
@@ -251,16 +258,19 @@ class FlappyBirdGame:
         self.bird.fly()
 
     def main_game(self):
-        self.base.move(self.BP_SPEED)
+        if self.frames_per_step > 0:
+            self.base.move(self.BP_SPEED)
         for pipe in self.pipes:
-            pipe.move(self.BP_SPEED)
+            if self.frames_per_step > 0:
+                pipe.move(self.BP_SPEED)
             pipe.draw()
         self.update_pipes()
         
         self.update_score()
         self.show_score(str(self.SCORE))
-        
-        self.bird.move()
+
+        if self.frames_per_step > 0:
+            self.bird.move()
         if self.check_crash():
             self.STATE_INDEX = next(self.STATE_SEQUENCE)
 
@@ -390,10 +400,32 @@ class FlappyBirdGame:
         if self.STATE_INDEX == 2:  # The bird died
             return self.get_state(), self.get_reward(), True
 
+    def step2(self, action):
+        # Perform one step in the game to go to the next state
+        self.frames_per_step = 10
+        if action == "jump":
+            if self.STATE_INDEX == 1:  # state is MAIN GAME, hence make the self.bird jump.
+                self.bird.velocity = self.JUMP_VELOCITY  # make self.bird go up
+
+            elif self.STATE_INDEX == 0:  # state is WELCOME.
+                self.bird.reset()
+                self.bird.velocity = self.JUMP_VELOCITY  # make self.bird go up
+                self.STATE_INDEX = next(self.STATE_SEQUENCE)
+
+        while self.frames_per_step > 0:
+            w = 1
+
+        if self.STATE_INDEX == 1:  # The bird is still alive
+            return False
+
+        if self.STATE_INDEX == 2:  # The bird died
+            return True
+
     def frames(self, t):
         self.display()
-        if t > 1:
-            glutTimerFunc(self.PERIOD, self.frames, t - 1)
+        if self.frames_per_step > 0:
+            self.frames_per_step -= 1
+        glutTimerFunc(self.PERIOD, self.frames, t)
 
     def keyboard(self, key, a, b):
         if key == b" ":
@@ -418,11 +450,16 @@ class FlappyBirdGame:
 
 
 env = FlappyBirdGame()
-# def run_flappy_bird():
 
-#
-# game_thread = threading.Thread(target=run_flappy_bird)
-# game_thread.start()
-print("hello")
+print("helloooooo")
 
-
+for episode in range(10):
+    env.reset()
+    done = False
+    while not done:
+        # Choose random action
+        action = random.randint(0, 1)
+        if action:
+            done = env.step2("jump")
+        else:
+            done = env.step2(" ")
