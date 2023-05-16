@@ -69,8 +69,8 @@ class Q_learn:
             self.Q = np.zeros(self.num_states + self.num_actions)
 
     # Set hyper parameters
-        self.alpha = 0.1
-        self.gamma = 0.01
+        self.alpha = 0.2
+        self.gamma = 0.1
         self.num_episodes = 0
 
         # Define epsilon (the exploration rate)

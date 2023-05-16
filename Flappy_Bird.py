@@ -421,6 +421,8 @@ class FlappyBirdGame:
             pipe_bird_distance_y = bird_centre - gap_top
             if pipe_bird_distance_y < pipe_bird_distance_x:
                 reward += 2
+        else:
+            reward -= 2
 
         return reward
 
