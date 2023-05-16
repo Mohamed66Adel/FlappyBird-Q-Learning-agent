@@ -37,7 +37,7 @@ def map_state_to_index(state):
         bird_v = 0
 
     pipe_x = mapping(state['pipe_positions'][0], 93, 20)
-    pipe_x = pipe_x if pipe_x <= 15 else 15
+    pipe_x = pipe_x if pipe_x <= 15 else 16
     pipe_y = mapping(state['pipe_positions'][1], 314, 10)
 
     indexes = (
@@ -59,7 +59,7 @@ class Q_learn:
         # Initialize Q-table
         self.num_states = (58,  # num of bird_y buckets
                            2,   # num of bird_velocity buckets
-                           16,  # num of gap_x buckets
+                           17,  # num of gap_x buckets
                            24   # num of gap_y buckets
                            )
         self.num_actions = (2,)  # It's a tuple
@@ -69,8 +69,8 @@ class Q_learn:
             self.Q = np.zeros(self.num_states + self.num_actions)
 
     # Set hyper parameters
-        self.alpha = 0.2
-        self.gamma = 0.1
+        self.alpha = 0.1
+        self.gamma = 0.05
         self.num_episodes = 0
 
         # Define epsilon (the exploration rate)

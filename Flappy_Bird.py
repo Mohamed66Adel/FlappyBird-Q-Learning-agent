@@ -18,11 +18,11 @@ class FlappyBirdGame:
         self.DISTANCE = SCREENWIDTH / 2  # distance between pipes
         self.SCORE = 0
         self.previous_score = 0
-        self.BP_SPEED = -5
+        self.BP_SPEED = -4
         # ######## bird's control ########################
         self.ANGULAR_SPEED = 3
         # control bird jump.
-        self.JUMP_VELOCITY = 5
+        self.JUMP_VELOCITY = 3
         self.GRAVITY = -0.22
         ###################################################
         self.pipes = []  # contains all displayed pipes on the screen
@@ -37,7 +37,7 @@ class FlappyBirdGame:
             self.cur_path + '/assets/sprites/mid.png',
             self.cur_path + '/assets/sprites/down.png')
         ##################################################
-        self.frames_per_step = 10  # number of frames after it the agent will take a decision
+        self.frames_per_step = 5  # number of frames after it the agent will take a decision
         self.counter = self.frames_per_step  # counter down to accumulate the number of frames
         self.agent = None
         self.next_pipe = None  # the pipe that the bird should focus on
@@ -401,28 +401,32 @@ class FlappyBirdGame:
         # score bonus
         if self.SCORE > self.previous_score:
             reward += 100
+            self.previous_score = self.SCORE
 
         bird_centre = state['bird_y']
-        gap_x = state['pipe_positions'][0] - self.next_pipe.width
+        gap_x = state['pipe_positions'][0] - self.next_pipe.width * 0.5
         gap_top = self.next_pipe.upper_y
         gap_down = self.next_pipe.lower_y
         bird_height = self.bird.height
+        gap_size_quarter = self.next_pipe.gap_size * 0.25
 
         # encourage the bird to be inside the scope of the gap
-        if gap_down + bird_height <= bird_centre <= gap_top - bird_height:  # within the gap exactly
-            reward += 10
+        if gap_down + gap_size_quarter <= bird_centre <= gap_top - gap_size_quarter:
+            reward += 60
+        elif gap_down + bird_height <= bird_centre <= gap_top - bird_height:  # within the gap exactly
+            reward += 20
         elif bird_centre < gap_down + bird_height:  # scope within 45deg lower than the gap
             pipe_bird_distance_x = gap_x - self.bird.right
             pipe_bird_distance_y = gap_down - bird_centre
             if pipe_bird_distance_y < pipe_bird_distance_x:
-                reward += 2
+                reward += 1
         elif bird_centre > gap_down - bird_height:  # scope within 45deg higher than the gap
             pipe_bird_distance_x = gap_x - self.bird.right
             pipe_bird_distance_y = bird_centre - gap_top
             if pipe_bird_distance_y < pipe_bird_distance_x:
-                reward += 2
+                reward += 1
         else:
-            reward -= 2
+            reward -= 5
 
         return reward
 
