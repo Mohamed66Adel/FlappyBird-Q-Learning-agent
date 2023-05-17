@@ -2,6 +2,22 @@ import random
 import numpy as np
 
 
+# ranges of state variables
+range = {
+    'bird_y': [140, 720],
+    'gap_x': [90, 400],
+    'gap_y': [300, 550]
+}
+# size of buckets
+bucket_size = [10, 30, 10]
+# num of buckets
+bucket_num = [int(i) for i in [
+                    (range['bird_y'][1] - range['bird_y'][0]) / bucket_size[0],
+                    (range['gap_x'][1] - range['gap_x'][0]) / bucket_size[1],
+                    (range['gap_y'][1] - range['gap_y'][0]) / bucket_size[2]
+                                ]]
+
+
 def mapping(sample, start, bucket_size):
     index = (sample - start) // bucket_size
     return int(index)
@@ -37,7 +53,7 @@ def map_state_to_index(state):
         bird_v = 0
 
     pipe_x = mapping(state['pipe_positions'][0], 93, 20)
-    pipe_x = pipe_x if pipe_x <= 15 else 16
+    pipe_x = pipe_x if pipe_x < bucket_num[1] else bucket_num[1]
     pipe_y = mapping(state['pipe_positions'][1], 314, 10)
 
     indexes = (
@@ -57,20 +73,20 @@ class Q_learn:
         self.next_state_index = None
         self.action_index = 1
         # Initialize Q-table
-        self.num_states = (58,  # num of bird_y buckets
+        self.num_states = (bucket_num[0],  # num of bird_y buckets
                            2,   # num of bird_velocity buckets
-                           17,  # num of gap_x buckets
-                           24   # num of gap_y buckets
+                           bucket_num[0] + 1,  # num of gap_x buckets
+                           bucket_num[0]   # num of gap_y buckets
                            )
         self.num_actions = (2,)  # It's a tuple
         try:
-            self.Q = np.load("./q_learn.npy")
+            self.Q = np.load("./q_table.npy")
         except FileNotFoundError:
             self.Q = np.zeros(self.num_states + self.num_actions)
 
     # Set hyper parameters
         self.alpha = 0.1
-        self.gamma = 0.05
+        self.gamma = 0.9
         self.num_episodes = 0
 
         # Define epsilon (the exploration rate)
@@ -130,5 +146,5 @@ class Q_learn:
             self.num_episodes += 1
 
             # save Q_table each 20 episodes
-            if self.num_episodes % 20 == 0:
+            if self.num_episodes % 200 == 0:
                 np.save("./q_table.npy", self.Q, allow_pickle=True)
