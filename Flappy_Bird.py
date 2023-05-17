@@ -431,9 +431,9 @@ class FlappyBirdGame:
             if pipe_bird_distance_y < pipe_bird_distance_x:
                 reward += 0
             if bird_v > 0:
-                reward -= 1
+                reward -= 2
             else:
-                reward += 1
+                reward += 2
         else:
             reward -= 5
 

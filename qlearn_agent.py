@@ -90,7 +90,7 @@ class Q_learn:
         self.num_episodes = 0
 
         # Define epsilon (the exploration rate)
-        self.epsilon = 0.1
+        self.epsilon = 0.05
 
     def reset(self):
         self.state_index = self.init_state_index
@@ -123,7 +123,7 @@ class Q_learn:
             action = "jump" if self.epsilon_greedy(state_index) else " "
         else:
             max_value = max(self.Q[state_index])
-            actions_indices = [i for i, v in self.Q[state_index] if v == max_value]
+            actions_indices = [i for i, v in enumerate(self.Q[state_index]) if v == max_value]
             action_index = random.choice(actions_indices)
             action = "jump" if action_index else " "
         return action
