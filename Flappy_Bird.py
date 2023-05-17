@@ -9,7 +9,7 @@ class FlappyBirdGame:
 
     def __init__(self):
         self.cur_path = str(Path(__file__).parent.resolve())
-        self.PERIOD = 1
+        self.PERIOD = 8
         # ######## to control the game ###############
         self.GAME_STATES = ["welcome", "main", "over"]
         self.STATE_SEQUENCE = cycle([1, 2, 0])
@@ -450,7 +450,7 @@ class FlappyBirdGame:
         return reward
 
     def agent_decide(self, state):
-        action = self.agent.take_action(state)
+        action = self.agent.take_action(state, exploration=False)
         if action == "jump":
             if self.STATE_INDEX == 1:  # state is MAIN GAME, hence make the self.bird jump.
                 self.SOUNDS["jump"].play()
