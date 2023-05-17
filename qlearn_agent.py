@@ -3,18 +3,18 @@ import numpy as np
 
 
 # ranges of state variables
-range = {
+RANGE = {
     'bird_y': [140, 720],
     'gap_x': [90, 400],
     'gap_y': [300, 550]
 }
 # size of buckets
-bucket_size = [2, 50, 2]
+BUCKET_SIZE = [2, 50, 2]
 # num of buckets
 bucket_num = [int(i) for i in [
-                    (range['bird_y'][1] - range['bird_y'][0]) / bucket_size[0],
-                    (range['gap_x'][1] - range['gap_x'][0]) / bucket_size[1],
-                    (range['gap_y'][1] - range['gap_y'][0]) / bucket_size[2]
+    (RANGE['bird_y'][1] - RANGE['bird_y'][0]) / BUCKET_SIZE[0],
+    (RANGE['gap_x'][1] - RANGE['gap_x'][0]) / BUCKET_SIZE[1],
+    (RANGE['gap_y'][1] - RANGE['gap_y'][0]) / BUCKET_SIZE[2]
                                 ]]
 
 
@@ -90,7 +90,7 @@ class Q_learn:
         self.num_episodes = 0
 
         # Define epsilon (the exploration rate)
-        self.epsilon = 0.05
+        self.epsilon = 0.01
 
     def reset(self):
         self.state_index = self.init_state_index
@@ -142,7 +142,7 @@ class Q_learn:
         if done:
             self.reset()
             # print number of complete episodes
-            print(self.num_episodes)
+            # print(self.num_episodes)
             self.num_episodes += 1
 
             # save Q_table each 20 episodes

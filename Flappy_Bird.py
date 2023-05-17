@@ -18,6 +18,11 @@ class FlappyBirdGame:
         self.DISTANCE = SCREENWIDTH / 2  # distance between pipes
         self.SCORE = 0
         self.previous_score = 0
+        try:
+            with open("score.txt") as data:
+                self.highest_score = int(data.read())
+        except FileNotFoundError:
+            self.highest_score = 0
         self.BP_SPEED = -4
         # ######## bird's control ########################
         self.ANGULAR_SPEED = 3
@@ -302,6 +307,10 @@ class FlappyBirdGame:
         # increase score if all bird's body crossed the pipe's right
         if not pipe.count and pipe.right <= self.bird.left:
             self.SCORE += 1
+            if self.SCORE > self.highest_score:
+                self.highest_score = self.SCORE
+                with open("score.txt", mode="w") as data:
+                    data.write(f"{self.highest_score}")
             self.SOUNDS["point"].play()
             pipe.count = True
             self.next_pipe = self.pipes[1]  # make the agent focus on the next pipe
@@ -367,6 +376,7 @@ class FlappyBirdGame:
 
         elif self.GAME_STATES[self.STATE_INDEX] == "over":
             self.game_over()
+            print(f"Episode: {self.agent.num_episodes}   Highest Score= {self.highest_score}")
 
         glutSwapBuffers()
 
