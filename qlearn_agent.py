@@ -9,7 +9,7 @@ range = {
     'gap_y': [300, 550]
 }
 # size of buckets
-bucket_size = [10, 30, 10]
+bucket_size = [2, 50, 2]
 # num of buckets
 bucket_num = [int(i) for i in [
                     (range['bird_y'][1] - range['bird_y'][0]) / bucket_size[0],
