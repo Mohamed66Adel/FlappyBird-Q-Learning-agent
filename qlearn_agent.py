@@ -64,8 +64,8 @@ class Q_learn:
         # Initialize Q-table
         self.num_states = (bucket_num[0],  # num of bird_y buckets
                            2,   # num of bird_velocity buckets
-                           bucket_num[0] + 1,  # num of gap_x buckets
-                           bucket_num[0]   # num of gap_y buckets
+                           bucket_num[1] + 1,  # num of gap_x buckets
+                           bucket_num[2]   # num of gap_y buckets
                            )
         self.num_actions = (2,)  # It's a tuple
         try:
