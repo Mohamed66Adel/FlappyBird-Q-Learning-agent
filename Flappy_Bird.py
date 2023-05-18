@@ -382,6 +382,7 @@ class FlappyBirdGame:
 
     def reset(self):
         self.pipes = [Pipe(self.TEXTURES["pipe"])]
+        self.next_pipe = self.pipes[0]
         self.bird.reset()
         self.SCORE = 0
         self.STATE_INDEX = 0
