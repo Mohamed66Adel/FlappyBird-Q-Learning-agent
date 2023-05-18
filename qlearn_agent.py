@@ -9,7 +9,7 @@ RANGE = {
     'gap_y': [300, 550]
 }
 # size of buckets
-BUCKET_SIZE = [2, 50, 2]
+BUCKET_SIZE = [5, 50, 5]
 # num of buckets
 bucket_num = [int(i) for i in [
     (RANGE['bird_y'][1] - RANGE['bird_y'][0]) / BUCKET_SIZE[0],
@@ -74,12 +74,12 @@ class Q_learn:
             self.Q = np.zeros(self.num_states + self.num_actions)
 
         # Set hyper parameters
-        self.alpha = 0.3
-        self.gamma = 0.9
+        self.alpha = 0.05
+        self.gamma = 0.95
         self.num_episodes = 0
 
         # Define epsilon (the exploration rate)
-        self.epsilon = 0.1
+        self.epsilon = 0.02
 
     def reset(self):
         self.state_index = self.init_state_index
@@ -130,6 +130,6 @@ class Q_learn:
             # print number of complete episodes
             # print(self.num_episodes)
             self.num_episodes += 1
-            # save Q_table each 100 episodes
-            if self.num_episodes % 100 == 0:
+            # save Q_table each 200 episodes
+            if self.num_episodes % 200 == 0:
                 np.save("./q_table.npy", self.Q, allow_pickle=True)

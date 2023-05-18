@@ -9,7 +9,7 @@ class FlappyBirdGame:
 
     def __init__(self):
         self.cur_path = str(Path(__file__).parent.resolve())
-        self.PERIOD = 8
+        self.PERIOD = 1
         # ######## to control the game ###############
         self.GAME_STATES = ["welcome", "main", "over"]
         self.STATE_SEQUENCE = cycle([1, 2, 0])
@@ -42,7 +42,7 @@ class FlappyBirdGame:
             self.cur_path + '/assets/sprites/mid.png',
             self.cur_path + '/assets/sprites/down.png')
         ##################################################
-        self.frames_per_step = 10  # number of frames after it the agent will take a decision
+        self.frames_per_step = 12  # number of frames after it the agent will take a decision
         self.counter = self.frames_per_step  # counter down to accumulate the number of frames
         self.agent = None
         self.next_pipe = None  # the pipe that the bird should focus on
@@ -416,6 +416,7 @@ class FlappyBirdGame:
         bird_centre = state['bird_y']
         bird_v = state['bird_v']
         gap_x = state['pipe_positions'][0] - self.next_pipe.width * 0.5
+        gap_y = state['pipe_positions'][1]
         gap_top = self.next_pipe.upper_y
         gap_down = self.next_pipe.lower_y
         bird_height = self.bird.height
@@ -425,6 +426,10 @@ class FlappyBirdGame:
         if gap_down + gap_size_quarter <= bird_centre <= gap_top - gap_size_quarter:
             reward += 60
         elif gap_down + bird_height <= bird_centre <= gap_top - bird_height:  # within the gap exactly
+            if bird_centre < gap_y and bird_v >= 0:
+                reward += 10
+            if bird_centre > gap_y and bird_v <= 0:
+                reward += 10
             reward += 20
         elif bird_centre < gap_down + bird_height:  # scope within 45deg lower than the gap
             pipe_bird_distance_x = gap_x - self.bird.right
@@ -432,25 +437,25 @@ class FlappyBirdGame:
             if pipe_bird_distance_y < pipe_bird_distance_x:
                 reward += 0
             if bird_v <= 0:
-                reward -= 1
+                reward -= 10
             else:
-                reward += 1
+                reward += 10
         elif bird_centre > gap_top - bird_height:  # scope within 45deg higher than the gap
             pipe_bird_distance_x = gap_x - self.bird.right
             pipe_bird_distance_y = bird_centre - gap_top
             if pipe_bird_distance_y < pipe_bird_distance_x:
                 reward += 0
             if bird_v > 0:
-                reward -= 2
+                reward -= 10
             else:
-                reward += 2
+                reward += 10
         else:
-            reward -= 5
+            reward -= 10
 
         return reward
 
     def agent_decide(self, state):
-        action = self.agent.take_action(state, exploration=False)
+        action = self.agent.take_action(state)
         if action == "jump":
             if self.STATE_INDEX == 1:  # state is MAIN GAME, hence make the self.bird jump.
                 self.SOUNDS["jump"].play()
