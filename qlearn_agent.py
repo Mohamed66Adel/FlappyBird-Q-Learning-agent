@@ -62,10 +62,10 @@ class Q_learn:
         self.next_state_index = None
         self.action_index = 1
         # Initialize Q-table
-        self.num_states = (bucket_num[0],  # num of bird_y buckets
+        self.num_states = (bucket_num[0] + 1,  # num of bird_y buckets
                            2,   # num of bird_velocity buckets
                            bucket_num[1] + 1,  # num of gap_x buckets
-                           bucket_num[2]   # num of gap_y buckets
+                           bucket_num[2] + 1  # num of gap_y buckets
                            )
         self.num_actions = (2,)  # It's a tuple
         try:
@@ -74,12 +74,12 @@ class Q_learn:
             self.Q = np.zeros(self.num_states + self.num_actions)
 
         # Set hyper parameters
-        self.alpha = 0.3
-        self.gamma = 0.99
+        self.alpha = 0.4
+        self.gamma = 0.9
         self.num_episodes = 0
 
         # Define epsilon (the exploration rate)
-        self.epsilon = 0.005
+        self.epsilon = 0.001
 
     def reset(self):
         self.state_index = self.init_state_index
@@ -129,6 +129,7 @@ class Q_learn:
             self.reset()
             # print number of complete episodes
             # print(self.num_episodes)
+            # print(self.Q.shape)
             self.num_episodes += 1
             # save Q_table each 200 episodes
             if self.num_episodes % 200 == 0:
