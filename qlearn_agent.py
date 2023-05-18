@@ -3,18 +3,18 @@ import numpy as np
 
 
 # ranges of state variables
-range = {
+RANGE = {
     'bird_y': [140, 720],
     'gap_x': [90, 400],
     'gap_y': [300, 550]
 }
 # size of buckets
-bucket_size = [10, 30, 10]
+BUCKET_SIZE = [5, 50, 5]
 # num of buckets
 bucket_num = [int(i) for i in [
-                    (range['bird_y'][1] - range['bird_y'][0]) / bucket_size[0],
-                    (range['gap_x'][1] - range['gap_x'][0]) / bucket_size[1],
-                    (range['gap_y'][1] - range['gap_y'][0]) / bucket_size[2]
+    (RANGE['bird_y'][1] - RANGE['bird_y'][0]) / BUCKET_SIZE[0],
+    (RANGE['gap_x'][1] - RANGE['gap_x'][0]) / BUCKET_SIZE[1],
+    (RANGE['gap_y'][1] - RANGE['gap_y'][0]) / BUCKET_SIZE[2]
                                 ]]
 
 
@@ -24,7 +24,6 @@ def mapping(sample, start, bucket_size):
 
 
 def map_state_to_index(state):
-    # Todo: convert continuous state to a discrete index
     # Todo: Take into your account that ... There is a special state at the start of the game "pipe_x variable is at the very right"
     """
     # input form:
@@ -35,26 +34,16 @@ def map_state_to_index(state):
         'score':
         'game_state':
     }
-
-    # ranges of important variables of the state:
-    state = {
-        'bird_y': [144:720]     bucket_size: 10
-        'bird_v': [-15:+5]      index: '0' or '1' for 'up' or 'down'
-        'pipe_positions': (
-                            pipe.gap_x: [93:393]        bucket_size: 20
-                            pipe.gap_y: [314:550]       bucket_size: 10
-                          )
-    }
     """
-    bird_y = mapping(state['bird_y'], 144, 10)
+    bird_y = mapping(state['bird_y'], RANGE['bird_y'][0], BUCKET_SIZE[0])
 
     bird_v = 1
     if state['bird_v'] < 0:
         bird_v = 0
 
-    pipe_x = mapping(state['pipe_positions'][0], 93, 20)
+    pipe_x = mapping(state['pipe_positions'][0], RANGE['gap_x'][0], BUCKET_SIZE[1])
     pipe_x = pipe_x if pipe_x < bucket_num[1] else bucket_num[1]
-    pipe_y = mapping(state['pipe_positions'][1], 314, 10)
+    pipe_y = mapping(state['pipe_positions'][1], RANGE['gap_y'][0], BUCKET_SIZE[2])
 
     indexes = (
         bird_y,
@@ -84,20 +73,17 @@ class Q_learn:
         except FileNotFoundError:
             self.Q = np.zeros(self.num_states + self.num_actions)
 
-    # Set hyper parameters
-        self.alpha = 0.1
-        self.gamma = 0.9
+        # Set hyper parameters
+        self.alpha = 0.3
+        self.gamma = 0.99
         self.num_episodes = 0
 
         # Define epsilon (the exploration rate)
-        self.epsilon = 0.05
+        self.epsilon = 0.005
 
     def reset(self):
         self.state_index = self.init_state_index
         self.action_index = 1
-
-    START_RANGES = [144, 93, 314]
-    BUCKET_SIZES = [10, 20]
 
     # Define a function to select an action using epsilon-greedy strategy
     def epsilon_greedy(self, state_index):
@@ -142,9 +128,8 @@ class Q_learn:
         if done:
             self.reset()
             # print number of complete episodes
-            print(self.num_episodes)
+            # print(self.num_episodes)
             self.num_episodes += 1
-
-            # save Q_table each 20 episodes
+            # save Q_table each 200 episodes
             if self.num_episodes % 200 == 0:
                 np.save("./q_table.npy", self.Q, allow_pickle=True)
